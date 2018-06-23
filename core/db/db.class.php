@@ -73,6 +73,10 @@ class DB
 	{
         return $this->result->fetch_object();
 	}
+	public function getArray()
+	{
+        return $this->result->fetch_array(MYSQLI_ASSOC);
+	}
 	public function fetchArray(int $simple=0):array
 	{
         $ar=[];

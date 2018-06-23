@@ -179,7 +179,7 @@ class Query
         else
         {
             $result = null;
-            $object = $this->select()->run()->getObject();
+            $object = $this->select()->run()->getArray();
             if($object != null)
             $result = ($this->model)::init($object);
             return $result;
