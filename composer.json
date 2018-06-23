@@ -1,0 +1,14 @@
+{
+  "require": {
+    "phpmailer/phpmailer": "~5.2",
+    "guzzlehttp/guzzle": "~6.0",
+    "meenie/Munee": "*",
+    "filp/whoops": "*",
+    "phpseclib/phpseclib": "~2.0",
+    "monolog/monolog": "^1.0",
+    "predis/predis": "v1.1.1",
+    "kunalvarma05/dropbox-php-sdk": "^0.2.1",
+    "aws/aws-sdk-php": "^3.36",
+    "wazaari/monolog-mysql": ">1.0.0"
+  }
+}

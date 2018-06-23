@@ -1,0 +1,12 @@
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$  index.php?route=$1 [L,QSA]
+
+
+## Begin - Security
+##RedirectMatch 404 (.git|tests|.AbiSuite|nbproject|.idea|.vs|vendor|.protected|core|models|log|helpers|cron|config) 
+## |controllers|views)
+##RedirectMatch 404 (vendor)/(.*)\.(txt|xml|md|html|yaml|php|pl|py|cgi|twig|sh|bat|dist|json|exe)
+##RedirectMatch 404 \.md
+##RedirectMatch 404 (composer.lock|composer.json|\.htaccess|LICENSE)

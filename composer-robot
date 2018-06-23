@@ -1,0 +1,16 @@
+{
+  "require": {
+    "phpmailer/phpmailer": "~5.2",
+    "guzzlehttp/guzzle": "~6.0",
+    "meenie/Munee": "*",
+    "phpFastCache/phpFastCache": "*",
+    "filp/whoops": "*",
+    "phpseclib/phpseclib": "~2.0",
+    "simple-html-dom/simple-html-dom": "*",
+    "monolog/monolog": "^1.0",
+    "consolidation/robo": "~1"
+  },
+  "autoload": {
+    "psr-4": { "HtmlDomApi": "simple-html-dom/simple-html-dom" }
+  }
+}
