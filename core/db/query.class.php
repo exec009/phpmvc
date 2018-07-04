@@ -130,7 +130,7 @@ class Query
 		$total = $this->getFoundRows();
 		foreach($objects as $data)
 		{
-			$model = ($this->model)::init($data->id);
+			$model = ($this->model)::init($data->{($this->model)::getDBColumn(($this->model)::getPrimaryKey())});
 			$rs = [];
 			foreach($columns as $key => $col)
 			{
