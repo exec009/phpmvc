@@ -73,7 +73,7 @@ class Validator
         {
             if($rules['Required']==true)
             {
-                if(empty($val) || (is_array($val) ? (count($val) < 1) : strlen(str_replace(" ","",$val))<1))
+                if((empty($val) && $val != 0) || (is_array($val) ? (count($val) < 1) : strlen(str_replace(" ","",$val))<1))
                 {
                     $result->status=false;
                     $result->message=$fieldName." is required";
@@ -86,7 +86,7 @@ class Validator
             switch($key)
             {
                 case 'Required':
-                    if(empty($val) || (is_array($val) ? (count($val) < 1) : strlen(str_replace(" ","",$val))<1))
+                    if((empty($val) && $val != 0) || (is_array($val) ? (count($val) < 1) : strlen(str_replace(" ","",$val))<1))
                     {
                         $result->status=false;
                         $result->message=$fieldName." is required";
