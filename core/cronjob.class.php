@@ -82,6 +82,8 @@ class CronJob
                     {
                         try
                         {
+                            if(($data['forever'] ?? false) === true)
+                            return;
                             if(Lock::isLocked($data['call']))
                             {
                                 $lockTime = Lock::getTime($data['call']);
