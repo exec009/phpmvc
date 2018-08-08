@@ -43,6 +43,13 @@ class Query
     {
         return ('\\'.$this->model)::getDBColumn($column);
     }
+	private function getColumns(array $columns) : array
+    {
+		foreach ($columns as $key => $value) {
+			$columns[$key] = $this->getColumn($value);
+		}
+        return $columns;
+    }
     public function toList() : array
     {
         if(!$this->isModel)
@@ -269,7 +276,7 @@ class Query
 				if($data[1]=="match")
 				{
                     if($this->isModel)
-                        $this->clause.=' match(`'.implode("`,`",$this->getColumn($data[0]))."`) against('".$data[2]."' IN BOOLEAN MODE) ";
+                        $this->clause.=' match(`'.implode("`,`",$this->getColumns($data[0]))."`) against('".$data[2]."' IN BOOLEAN MODE) ";
                     else
     					$this->clause.=' match(`'.implode("`,`",$data[0])."`) against('".$data[2]."' IN BOOLEAN MODE) ";
 				}
