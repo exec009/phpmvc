@@ -499,7 +499,8 @@ class MVC
             {
                 $formVars = $_POST;
             }
-
+            $controller->isPost = count($_POST) > 0;
+			
             if($antiForgeryToken && !\CORE\Hash::validateAntiForgeryToken($formVars['anit_forgery_verification_token'] ?? ''))
             {
                 $controller->ModelStateIsValid = false;

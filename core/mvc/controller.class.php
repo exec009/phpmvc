@@ -19,6 +19,7 @@ class Controller implements IController
         $action,
         $viewData,
         $ModelStateIsValid,
+		$isPost,
         $modelError,
         $isAjaxFormRequest;
     private static $siteStatic;
