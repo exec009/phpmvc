@@ -280,7 +280,7 @@ class Query
                     else
     					$this->clause.=' match(`'.implode("`,`",$data[0])."`) against('".$data[2]."' IN BOOLEAN MODE) ";
 				}
-                else if ($data[1] == 'in')
+                else if ($data[1] == 'in' || $data[1] == '!in')
                 {
                     if($this->isModel)
                     {
@@ -293,7 +293,10 @@ class Query
                             $data[2][$_kts] = $_dts->getId();
                         }
                     }
+					if($data[1] == 'in')
                     $this->clause.="`$data[0]` in ('".implode("','", $data[2])."')";
+					else
+                    $this->clause.="`$data[0]` not in ('".implode("','", $data[2])."')";
                 }
 				else
 				{
