@@ -318,9 +318,11 @@ class MVC
                             else if(strtolower($input->type) != "password")
                             {
                                 if($isArray)
-                                    $input->{'value'} = $_POST[$name][$arrayCounter[$oldName] - 1] ?? ($model == null ? null : ($model->{"get".$name}()[$arrayCounter[$oldName] - 1]));
+                                    $vvvv = $_POST[$name][$arrayCounter[$oldName] - 1] ?? ($model == null ? null : ($model->{"get".$name}()[$arrayCounter[$oldName] - 1]));
                                 else
-                                    $input->{'value'} = $_POST[$name] ?? ($model == null ? null : ($model->{"get".$name}()));
+                                    $vvvv = $_POST[$name] ?? ($model == null ? null : ($model->{"get".$name}()));
+                                if(!empty($vvvv))
+                                $input->{'value'} = $vvvv;
                             }
                         }
                         else
