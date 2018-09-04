@@ -1,11 +1,13 @@
 <?php
 namespace CORE\DB;
-class Query
+class Query implements IQuery
 {
-	public $table,$model,$isModel,$query,$clause,$order,$limit,$startquery,$group,$type,$having_clause;
-	public static function table(string $table, string $model = '')
+	public $table,$model,$isModel,$query,$clause,$order,$limit,$startquery,$group,$type,$having_clause, $alias, $aliasColumn, $modelSoftClass = false;
+	public static function table(string $table, string $model = '', string $alias = null, IQuery $parent = null): IQuery
 	{
 		$self = new self($table, $model);
+		$self->alias = $alias;
+        $self->aliasColumn = $self->alias === null ? '' : $self->alias.'`.`';
 		return $self;
 	}
     public function __construct(string $table, string $model)
@@ -39,11 +41,11 @@ class Query
 		$this->type="select";
 		return $this;
 	}
-    private function getColumn(string $column) : string
+	protected function getColumn(string $column) : string
     {
         return ('\\'.$this->model)::getDBColumn($column);
     }
-	private function getColumns(array $columns) : array
+	protected function getColumns(array $columns) : array
     {
 		foreach ($columns as $key => $value) {
 			$columns[$key] = $this->getColumn($value);
@@ -52,16 +54,21 @@ class Query
     }
     public function toList() : array
     {
+		echo $this."<br/>";
+		exit();
         if(!$this->isModel)
         return $this->run()->fetchObject();
         else
         {
-            $result = [];
-            $objects = $this->select()->run()->fetchArray();
+			$result = $objects = [];
+			if($this->startquery === null)
+				$objects = $this->select()->run()->fetchArray();
+			else
+				$objects = $this->run()->fetchArray();
             foreach($objects as $data)
             {
-                $result[] = ($this->model)::init($data);
-            }
+                $result[] = ($this->model)::init($data, $this->modelSoftClass);
+			}
             return $result;
         }
     }
@@ -185,10 +192,13 @@ class Query
             return $this->run()->getObject();
         else
         {
-            $result = null;
-            $object = $this->select()->run()->getArray();
+			$result = $object = null;
+			if($this->startquery === null)
+			$object = $this->select()->run()->getArray();
+			else
+            $object = $this->run()->getArray();
             if($object != null)
-            $result = ($this->model)::init($object);
+			$result = ($this->model)::init($object, $this->modelSoftClass);
             return $result;
         }
     }
@@ -225,37 +235,35 @@ class Query
 		$this->type="delete";
 		return $this;
 	}
-	public function orderBy(array $order):self
+	public function orderBy(array $order): IQuery
 	{
 		$this->order=' order by ';
 		$orders=[];
 		foreach($order as $key=>$data)
 		{
-            if($this->isModel)
-                $key = $this->getColumn($key);
 			$orders[]=$key.' '.$data.' ';
 		}
 		$this->order.=implode(', ',$orders);
 		return $this;
 	}
-	public function orderByRandom():self
+	public function orderByRandom(): IQuery
 	{
 		$this->order=' order by rand() ';
 		return $this;
 	}
-    private function parentWhere(...$clauses) : self
-    {
-         return $this->where($clauses);
-    }
-	public function where(...$clauses) : self
-	{
-        return $this->whereCore($clauses);
-	}
-    protected function fixArray($ar) : array
+    protected function fixArray($ar): array
     {
         return count($ar) == 1 ? $ar[0] : $ar;
     }
-    protected function whereCore(...$clauses) : self
+    private function parentWhere(...$clauses): IQuery
+    {
+         return $this->where($clauses);
+    }
+	public function where(...$clauses): IQuery
+	{
+        return $this->whereCore($clauses);
+	}
+    protected function whereCore(...$clauses): IQuery
 	{
 		if(strlen($this->clause)<4)
 			$this->clause=" where ";
@@ -275,24 +283,10 @@ class Query
 			{
 				if($data[1]=="match")
 				{
-                    if($this->isModel)
-                        $this->clause.=' match(`'.implode("`,`",$this->getColumns($data[0]))."`) against('".$data[2]."' IN BOOLEAN MODE) ";
-                    else
-    					$this->clause.=' match(`'.implode("`,`",$data[0])."`) against('".$data[2]."' IN BOOLEAN MODE) ";
+					$this->clause.=' match(`'.implode("`,`",$data[0])."`) against('".$data[2]."' IN BOOLEAN MODE) ";
 				}
                 else if ($data[1] == 'in' || $data[1] == '!in')
                 {
-                    if($this->isModel)
-                    {
-                        $data[0] = $this->getColumn($data[0]);
-                    }
-                    if($this->isModel && is_object($data[2][0] ?? null))
-                    {
-                        foreach($data[2] as $_kts => $_dts)
-                        {
-                            $data[2][$_kts] = $_dts->getId();
-                        }
-                    }
 					if($data[1] == 'in')
                     $this->clause.="`$data[0]` in ('".implode("','", $data[2])."')";
 					else
@@ -302,23 +296,10 @@ class Query
 				{
 					if(!is_int($data[2]) && ($data[3]??true)==true)
 	                    $data[2]='"'.$data[2].'"';
-
-                    if($this->isModel)
-                    {
-                        $maincol=$this->getColumn($data[0]);
-                        if(($data[4]??true)==true)
-                            $maincol='`'.$this->getColumn($data[0]).'`';
-
-                        $this->clause.=$maincol.$data[1].$data[2]." ";
-                    }
-                    else
-                    {
-                        $maincol=$data[0];
-                        if(($data[4]??true)==true)
-                            $maincol='`'.$data[0].'`';
-
-                        $this->clause.=$maincol.$data[1].$data[2]." ";
-                    }
+					$maincol=$data[0];
+					if(($data[4]??true)==true)
+						$maincol='`'.$data[0].'`';
+					$this->clause.=$maincol.$data[1].$data[2]." ";
 				}
 			}
 			else
@@ -327,14 +308,13 @@ class Query
 		$this->clause=$this->clause;
 		return $this;
 	}
-	public function having(...$clauses):self
+	public function having(...$clauses): IQuery
 	{
 		if(strlen($this->having_clause)<4)
 			$this->having_clause=" having ";
 
 		foreach($clauses as $key=>$data)
 		{
-
 			if(is_array($data[0]))
 			{
 				$this->having_clause.=' ( ';
@@ -344,10 +324,6 @@ class Query
 			}
 			else if(is_array($data))
 			{
-                if($this->isModel)
-                {
-                    $data[0] = $this->getColumn($data[0]);
-                }
 				if(!is_int($data[2]))
                     $data[2]='"'.$data[2].'"';
                 if(($data[3]??true)==true)
@@ -361,21 +337,14 @@ class Query
 		$this->having_clause=$this->having_clause;
 		return $this;
 	}
-	public function limit(int $l1=0,int $l2):self
+	public function limit(int $l1=0,int $l2): self
 	{
 		$this->limit=" limit ".$l1.", ".$l2;
 		return $this;
 	}
-	public function groupBy(string ...$group)
+	public function groupBy(string ...$group): IQuery
 	{
-        if($this->isModel)
-        {
-            foreach($group as $key => $data)
-            {
-                $group[$key] = $this->getColumn($data);
-            }
-        }
-		if(count($group)>0)
+		if(count($group) > 0)
 		{
 			$this->group=' group by '.implode(',',$group);
 		}
@@ -385,7 +354,7 @@ class Query
 	{
         try
         {
-            $result = DB::{$this->type}($this->get());
+			$result = DB::{$this->type}($this->get());
         }
         catch(IDBException $e)
         {
