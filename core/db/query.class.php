@@ -54,8 +54,6 @@ class Query implements IQuery
     }
     public function toList() : array
     {
-		echo $this."<br/>";
-		exit();
         if(!$this->isModel)
         return $this->run()->fetchObject();
         else
