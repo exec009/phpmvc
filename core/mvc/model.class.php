@@ -2,6 +2,7 @@
 namespace CORE\MVC;
 use CORE\DB\ModelQuery;
 use CORE\DB\IQuery;
+use CORE\DB\Query;
 use CORE\Date;
 class Model
 {
@@ -20,7 +21,7 @@ class Model
 		{
             if(is_numeric($id))
             {
-                $result=ModelQuery::table($ins1::$table)->select()->where(['id','=',$id])->limit(0,1)->run();
+                $result=Query::table($ins1::$table, static::class)->select()->where(['id','=',$id])->limit(0,1)->run();
                 if($result->num_rows < 1)
                 {
                     throw new ObjectNotFoundException(get_called_class() . " Object Not Found for id $id");

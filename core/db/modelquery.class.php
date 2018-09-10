@@ -205,17 +205,17 @@ class ModelQuery extends Query implements IQuery
         if(count($cl) > 1)
         {
             if($cl[0] === $this->alias)
-            return "`{$this->aliasColumn}".('\\'.$this->model)::getDBColumn($cl[1]).'`';
+            return "`{$this->aliasColumn}".(('\\'.$this->model)::getDBColumn($cl[1])).'`';
             else
             return $column;
         }
         else
-        return "`{$this->aliasColumn}".('\\'.$this->model)::getDBColumn($column).'`';
+        return "`{$this->aliasColumn}".(('\\'.$this->model)::getDBColumn($column)).'`';
     }
     private function normalizeStringValue(string $value): string
     {
         $cl = explode('.', $value);
-        if(count($cl) == 2 && $cl[0] === $this->parentQuery->alias)
+        if($this->parentQuery !== null && count($cl) == 2 && $cl[0] === $this->parentQuery->alias)
         {
             try
             {
