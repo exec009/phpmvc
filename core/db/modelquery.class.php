@@ -7,7 +7,7 @@ class ModelQuery extends Query implements IQuery
 	public static function table(string $table, string $model = '', string $alias = null, IQuery $parentQuery = null): IQuery
 	{
 		$self = new self($table, $model);
-		$self->alias = $alias;
+        $self->alias = $alias;
         $self->aliasColumn = $self->alias === null ? '' : $self->alias.'`.`';
         $self->parentQuery = $parentQuery;
 		return $self;
