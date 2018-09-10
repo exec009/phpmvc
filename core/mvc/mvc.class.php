@@ -145,7 +145,7 @@ class MVC
                 $area=$cn[0];
                 $controller=($cn[1]);
                 $action=$cn[2];
-                require_once root()."controllers/".lcfirst($cn[0])."/".$controller.".php";
+                require_once root()."controllers/".lcfirst($cn[0])."/".lcfirst($controller).".php";
                 $controller=$cn[0]."\\".$controller;
             }
             else
