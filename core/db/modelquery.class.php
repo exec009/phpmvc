@@ -183,6 +183,11 @@ class ModelQuery extends Query implements IQuery
                         $this->clause.="$data[0] not in ('".implode("','", $data[2])."')";
                     }
                 }
+                else if ($data[1] === 'between')
+                {
+                    $data[0] = $this->getColumn($data[0]);
+                    $this->clause .= "$data[0] between '".$data[2][0]."' and  '".$data[2][1]."'";
+                }
 				else
 				{
 					if(!is_int($data[2]) && ($data[3]??true)==true)

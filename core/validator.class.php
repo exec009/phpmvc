@@ -85,12 +85,15 @@ class Validator
         {
             switch($key)
             {
-                case 'Required':
-                    if((empty($val) && $val != 0) || (is_array($val) ? (count($val) < 1) : strlen(str_replace(" ","",$val))<1))
-                    {
-                        $result->status=false;
-                        $result->message=$fieldName." is required";
-                    }
+				case 'Required':
+					if($data === true)
+					{
+						if((empty($val) && $val != 0) || (is_array($val) ? (count($val) < 1) : strlen(str_replace(" ","",$val))<1))
+						{
+							$result->status=false;
+							$result->message=$fieldName." is required";
+						}
+					}
                     break;
                 case 'Max':
                     if((($rules['Type'] ?? 'String') == 'Int' && $val > $data) || (($rules['Type'] ?? 'String') != 'Int' && strlen($val) > $data))

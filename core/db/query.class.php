@@ -290,6 +290,10 @@ class Query implements IQuery
 					else
                     $this->clause.="`$data[0]` not in ('".implode("','", $data[2])."')";
                 }
+                else if ($data[1] === 'between')
+                {
+                    $this->clause .= "$data[0] between '".$data[2][0]."' and  '".$data[2][1]."'";
+                }
 				else
 				{
 					if(!is_int($data[2]) && ($data[3]??true)==true)
