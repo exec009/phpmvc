@@ -2,6 +2,15 @@
 namespace CORE;
 class Cookie
 {
+    public static function getAll(): array
+    {
+        $ck = [];
+        foreach($_COOKIE as $key => $data)
+        {
+            $ck[$key] = self::get($key);
+        }
+        return $ck;
+    }
     public static function set(string $name, $value, int $expireyInSeconds = 86400): void
     {
         setcookie($name, Hash::encrypt($value), time() + ($expireyInSeconds), "/");

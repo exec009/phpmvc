@@ -391,7 +391,7 @@ class MVC
             $form->innertext .= '<input name="form_submitted" type="hidden" value="1"/>';
             if($antiForgeryToken)
             {
-                $token = \CORE\Hash::createAntiForgeryToken();
+                $token = \CORE\AntiForgery::createToken();
                 $form->innertext .= '<input type="hidden" name="anit_forgery_verification_token" value="'.$token.'"/>';
             }
         }
@@ -501,11 +501,13 @@ class MVC
             {
                 $formVars = $_POST;
             }
+
             $controller->isPost = count($_POST) > 0;
 			
-            if($antiForgeryToken && !\CORE\Hash::validateAntiForgeryToken($formVars['anit_forgery_verification_token'] ?? ''))
+            if($antiForgeryToken && !\CORE\AntiForgery::verifyToken($formVars['anit_forgery_verification_token'] ?? ''))
             {
                 $controller->ModelStateIsValid = false;
+                $controller->modelStateIsValid = false;
             }
 
             if(count($model)<1)
@@ -581,6 +583,7 @@ class MVC
                         {
                             $controller->modelError = $validation1->message;
                             $controller->ModelStateIsValid = false;
+                            $controller->modelStateIsValid = false;
                         }
                     }
                     catch(\BadMethodCallException $e)
@@ -592,6 +595,7 @@ class MVC
                 {
                     $controller->modelError = "Form Not Submitted";
                     $controller->ModelStateIsValid = false;
+                    $controller->modelStateIsValid = false;
                 }
             if($routeId == null)
             $page=$controller->{$action}($model);
@@ -612,15 +616,10 @@ class MVC
         }
 		if($modelIsNull === true && $page->getModel() !== null)
 			$model = $page->getModel();
-        if($controller->isAjaxFormRequest)
+        if($page->isJSON)
         {
             header("Content-type:application/json");
-            $messages = \CORE\Message::getAll();
-            \CORE\Message::clearAll();
-            if(count($messages) > 0 && $controller->ModelStateIsValid)
-                $messages[0]['token'] = \CORE\Hash::createAntiForgeryToken();
-            $json = json_decode($page->getHtml(), true);
-            echo json_encode(count($messages) > 0 ? $messages[0] : ( is_array($json) ? $json : ['status'=>3, 'message'=> 'No Message is returned']));
+            echo $page->getContent();
         }
         else
         echo self::processHTML($controller, $page->getHtml(),$model,

@@ -85,7 +85,6 @@ class App
     public static function install()
     {
         CronJob::createTable();
-        \CORE\MODELS\ForgeryToken::createTable();
         \CORE\MODELS\Option::createTable();
         \MODELS\SITE\Site::createTable();
         \MODELS\ADMIN\Admin::createTable();

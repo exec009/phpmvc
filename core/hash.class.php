@@ -45,8 +45,8 @@ class Hash
 		$privkey=self::getPrivateKey();
 		openssl_get_privatekey($privkey);
 		openssl_private_decrypt(base64_decode($encryptedValue),$finaltext,$privkey);
-		return $finaltext;
-	}
+		return $finaltext ?? '';
+    }
 	public static function decryptArray(array $array):array
 	{
 		$privkey=self::getPrivateKey();
@@ -135,19 +135,11 @@ class Hash
         $token.="==";
         $token = base64_decode($token);
         $token = explode("_-+-_", $token);
-
-        $db = \CORE\DB\DB::getInstanceName();
-        \CORE\DB\DB::init('INTERNAL');
-        if(\CORE\MODELS\ForgeryToken::find()->where(['Token','=',$originalToken])->single() != null)
-        {
-            \CORE\DB\DB::init($db);
-            return false;
-        }
         $status = self::verifySignature($token[0],  self::getUserInfo() . ($token[1] ?? ''));
         return $status;
     }
     private static function getUserInfo() : string
-    {
+    {   
         return $_SERVER['HTTP_USER_AGENT'] . getIp() . hash("sha256", $_SERVER['HTTP_USER_AGENT']);
     }
 }

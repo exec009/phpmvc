@@ -19,12 +19,15 @@ class Controller implements IController
         $action,
         $viewData,
         $ModelStateIsValid,
+        $modelStateIsValid,
 		$isPost,
         $modelError,
+        $isAjax,
         $isAjaxFormRequest;
     private static $siteStatic;
 	public function __construct()
 	{
+        $this->isAjax = isAjax();
         $this->viewData=new \stdClass();
         if(empty(self::$siteStatic))
         {
@@ -44,6 +47,7 @@ class Controller implements IController
             $this->site = self::$siteStatic;
         }
         $this->ModelStateIsValid = true;
+        $this->modelStateIsValid = true;
 	}
     public static function getAllControllersWithActions($path = '')
     {
@@ -114,15 +118,6 @@ class Controller implements IController
 	}
 	public function afterRender():void
 	{
-        if($this->ModelStateIsValid && isset($_POST['anit_forgery_verification_token']))
-        {
-            $db = \CORE\DB\DB::getInstanceName();
-            \CORE\DB\DB::init('INTERNAL');
-            $forgToken = \CORE\MODELS\ForgeryToken::init();
-            $forgToken->setToken($_POST['anit_forgery_verification_token']);
-            $forgToken->save();
-            \CORE\DB\DB::init($db);
-        }
 	}
 	public function activeCheck(string $action):void
 	{
@@ -172,8 +167,10 @@ class Controller implements IController
     {
 		if(is_string($data))
         return View::init($data);
-		else if(is_object($data) || is_array($data))
-        return View::init(json_encode($data));
+        else if(is_object($data) || is_array($data))
+        {
+            return View::init(json_encode($data), null, true);
+        }
 		else if(is_int($data))
         return View::init((string) $data);
 		else

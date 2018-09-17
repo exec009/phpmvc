@@ -14,13 +14,13 @@ class Message
     private static $key = "message_fsd8f78";
 	public static function add(string $message, int $status)
 	{
-        self::$messages[] = ['status'=>$status, 'message'=>$message];
+        self::$messages[] = ['status' => $status, 'message' => $message];
 	}
     public static function addGlobal(string $message, int $status)
     {
         self::add($message, $status);
         $data = json_decode(Session::exists(self::$key) ? Session::get(self::$key) : '{}', true);
-        $data[] = ['status'=>$status, 'message'=>$message];
+        $data[] = ['status' => $status, 'message' => $message];
         Session::set(self::$key, json_encode($data));
     }
     private static function constructMessage(array $message)
@@ -34,16 +34,6 @@ class Message
         \CORE\Session::remove(self::$key);
         self::$messages = [];
     }
-    /*
-	public static function getMessage()
-	{
-		if(isset($_SESSION['msg_sd7987fsd7f']))
-		{
-			$messageArray=$_SESSION['msg_sd7987fsd7f'];
-			unset($_SESSION['msg_sd7987fsd7f']);
-            return self::constructMessage($messageArray);
-		}
-	}*/
     public static function toString() : string
     {
        $str = '';
@@ -62,6 +52,10 @@ class Message
     public static function getAll()
     {
         return self::$messages;
+    }
+    public static function getLastMessage(): array
+    {
+        return self::$messages[count(self::$messages)-1];
     }
 }
 ?>

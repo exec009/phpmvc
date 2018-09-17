@@ -147,13 +147,3 @@ class Join extends Query
 		return $this;
 	}
 }
-/*
-\MODELS\USER\User::selectAs('a')
-    ->join('a.ID',\MODELS\USER\Wallet::selectAs('b.UserId'))
-    ->leftJoin('b.ID',\MODELS\USER\Wallet::selectAs('c.WalletId'))
-    ->where(['C.Id','=','221'])
-->select(new class {
-    public $userId = "a.UserId";
-    public $name = "b.Name";
-})->toList();
-*/
