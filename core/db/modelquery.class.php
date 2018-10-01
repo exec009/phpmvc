@@ -78,7 +78,7 @@ class ModelQuery extends Query implements IQuery
                 if(!in_array($key, $this->modelCustomKeys))
                 throw $e;
             }
-            $orders[] = $key.' '.$data.' ';
+            $orders[] = $key1.' '.$data.' ';
 		}
         $this->order.=implode(', ',$orders);
 		return $this;
